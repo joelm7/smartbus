@@ -379,7 +379,6 @@ void loop( void )
   return ;
 }
 
-// unused, trim
 void toggleblueLED( void )
 {
   if ( redPinState )

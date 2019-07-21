@@ -1,9 +1,5 @@
-////////////////////
-//  esp  nodemcu  //
-//   thinkspeak   //
-//     final      //
-////////////////////
-#include <SoftwareSerial.h>
+// both thinkspeak and firebase used
+#include <SoftwareSerial.h>     
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <FirebaseArduino.h>
@@ -29,12 +25,13 @@ HTTPClient http;
 void setup()
 {
   Serial.begin(9600);
-  NodeMCU.begin(9600);
+  NodeMCU.begin(9600); //for serial communication with arduino 
+  // pins for serial comm
   pinMode(D1, INPUT);
   pinMode(D2, OUTPUT);
-   pinMode(D0, OUTPUT);
+  pinMode(D0, OUTPUT); // connection status led
   WiFi.disconnect();
-  WiFi.begin("AndroidAP", "mnmnmnmn");
+  WiFi.begin("AndroidAP", "12345678"); //username and password for wifi
   Serial.print("connecting");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
@@ -45,9 +42,8 @@ void setup()
   digitalWrite (D0,HIGH);
   Serial.println(WiFi.localIP());
   
-  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH); //connecting to firebase
 }
-
 
 void loop()
 {
@@ -58,7 +54,7 @@ void loop()
     character = NodeMCU.read();
     content.concat(character);
   }
-
+//variables for storing value of student 1, student 2, student 3, total
   a= content.charAt(1);
   b= content.charAt(3);
   c= content.charAt(5);
@@ -66,7 +62,7 @@ void loop()
   
 if(a!=0){
   Serial.println(content);    
-i=a-'0';
+i=a-'0'; // to convert asci to int
 j=b-'0';
 k=c-'0';
 total=t-'0';
@@ -79,7 +75,7 @@ total=t-'0';
   Serial.print("TOTAL =");
   Serial.println(total);
 }
-  
+  // updating values to thinkspeak API 
   if (client.connect("api.thingspeak.com", 80)) {
     request_string = thingSpeakAddress;
     request_string += "key=";
@@ -105,7 +101,7 @@ total=t-'0';
     http.begin(request_string);
     http.GET();
     http.end();
-     // set value
+     // set values in firebase fields
   Firebase.setInt("student1", i);
   Firebase.setInt("student2", j);
   Firebase.setInt("student3", k);
